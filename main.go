@@ -1,18 +1,41 @@
 package main
 
+//import (
+//	"io"
+//	"log"
+//	"net/http"
+//)
 import (
-	"io"
+	"context"
+	"fmt"
 	"log"
-	"net/http"
+	"time"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func main() {
-	// Hello world, the web server
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
+	fmt.Println("Starting Ping the MongoDB database ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		panic(err)
 	}
 
-	http.HandleFunc("/hello", helloHandler)
-	log.Println("Listing for requests at http://localhost:8000/hello")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+
+	if err := client.Ping(ctx, readpref.Primary()); err != nil {
+		log.Fatalf("ping mongodb error :%v", err)
+		return
+	}
+	fmt.Println("ping success")
 }
