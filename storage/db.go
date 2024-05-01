@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var client mongo.Client
+var client *mongo.Client
 
 func InitDB() {
 	
@@ -20,7 +20,7 @@ func InitDB() {
 		defer cancel()
 
 		var err error
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 		if err != nil {
 			panic(err)
 		}
@@ -40,6 +40,6 @@ func InitDB() {
 	fmt.Println("Successfully connected to database")
 }
 
-func GetClient() mongo.Client {
+func GetClient() *mongo.Client {
 	return client
 }
