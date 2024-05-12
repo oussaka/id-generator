@@ -4,40 +4,61 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var client *mongo.Client
+var Collections struct {
+	Users *mongo.Collection
+}
 
 func InitDB() {
-	
-	fmt.Println("Starting Ping the MongoDB database ...")
-	
-		ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
-		defer cancel()
+	log.Print("Initializing database connection")
 
-		var err error
-		client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-		if err != nil {
+	var err error
+	client, err = connectDB()
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	Collections.Users = client.Database(dbName).Collection("users")
+}
+
+func connectDB() (*mongo.Client, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+
+	mongoURI := os.Getenv("MONGO_URI")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a new client: %v", err)
+	}
+
+	/* defer func() {
+		fmt.Print("disctonnecte ---------------------")
+		if err = client.Disconnect(ctx); err != nil {
 			panic(err)
 		}
-	
-		/* defer func() {
-			fmt.Print("disctonnecte ---------------------")
-			if err = clientMongo.Disconnect(ctx); err != nil {
-				panic(err)
-			}
-		}()*/
-	
-		if err := client.Ping(ctx, readpref.Primary()); err != nil {
-			log.Fatalf("ping mongodb error :%v", err);
-			return
-		}
+	}() */
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping the database: %v", err)
+	}
 
 	fmt.Println("Successfully connected to database")
+
+	return client, nil
 }
 
 func GetClient() *mongo.Client {

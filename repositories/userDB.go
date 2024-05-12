@@ -10,9 +10,7 @@ import (
 
 func CreateUser(user models.User) (models.User, error) {
 	fmt.Println("Creating user...")
-	mongoClient := storage.GetClient()
-	usersCollection := mongoClient.Database("idgeneratordb").Collection("users")
-	insertedResult, err := usersCollection.InsertOne(context.TODO(), user)
+	insertedResult, err := storage.Collections.Users.InsertOne(context.TODO(), user)
 
 	if err != nil {
 		log.Fatalf("inserted error : %v", err)
