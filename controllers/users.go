@@ -29,20 +29,28 @@ func CreateUser(c echo.Context) error {
 }
 
 func UpdateUser(c echo.Context) error {
-	id := c.Param("id")
-	fmt.Println(id)
-
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
+	uid := c.Param("uid")
 
 	user := models.User{}
 	c.Bind(&user)
-	updatedUser, err := repositories.UpdateUser(user, idInt)
+	updatedUser, err := repositories.UpdateUser(user, uid)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+
 	return c.JSON(http.StatusOK, updatedUser)
 }
 
+func DeleteUser(c echo.Context) error {
+	uid := c.Param("uid")
+	fmt.Println(uid)
+
+	user := models.User{}
+	c.Bind(&user)
+	deletedUser, err := repositories.DeleteUser(user, uid)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusNoContent, deletedUser)
+}
