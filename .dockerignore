@@ -1,0 +1,10 @@
+# Git repo
+.git
+
+# logs
+logs/
+
+# IDE files
+.idea/
+
+.gitignore
