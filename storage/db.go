@@ -25,7 +25,7 @@ func InitDB() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	dbName := os.Getenv("DB_NAME")
+	dbName := os.Getenv("MONGO_DATABASE")
 	Collections.Users = client.Database(dbName).Collection("users")
 }
 

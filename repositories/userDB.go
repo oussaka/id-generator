@@ -47,7 +47,23 @@ func GetUsers() ([]models.User, error) {
 
 	log.Printf("%v documents fetched ", len(queryResult))
 
-	return users, nil
+	return users, err
+}
+
+func GetUser(uid string) (models.User, error) {
+	fmt.Println("GET user...")
+
+	var user models.User
+	var filter = bson.D{{"uid", uid}}
+
+	err := storage.Collections.Users.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		log.Fatalf("find collection err : %v", err)
+	}
+
+	log.Printf("%v documents fetched ", user)
+
+	return user, err
 }
 
 func CreateUser(user models.User) (models.User, error) {

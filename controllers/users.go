@@ -5,7 +5,6 @@ import (
 	"id-generator/repositories"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,6 +12,35 @@ import (
 //----------
 // Handlers
 //----------
+func GetUsers(c echo.Context) error {
+	fmt.Println("GETUsers controller")
+
+	// query all data
+	fmt.Println("== query all data ==")
+
+	users, err := repositories.GetUsers()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
+
+func GetUser(c echo.Context) error {
+	fmt.Println("GETUser controller")
+
+	uid := c.Param("uid")
+	// query all data
+	fmt.Println("== query all data ==")
+
+	user, err := repositories.GetUser(uid)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
 func CreateUser(c echo.Context) error {
 	user := models.User{}
 	c.Bind(&user)
