@@ -10,6 +10,7 @@ func New() *echo.Echo {
 	v1 := r.Group("/v1")
 	{
 		UsersRoute(v1)
+		PingRoute(v1)
 	}
 
 	return r
