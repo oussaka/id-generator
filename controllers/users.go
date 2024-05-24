@@ -35,6 +35,9 @@ func GetUser(c echo.Context) error {
 
 	user, err := repositories.GetUser(uid)
 	if err != nil {
+		if (err.Error() == "cannot find user") {
+			return c.JSON(http.StatusNotFound, err.Error())
+		}
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
