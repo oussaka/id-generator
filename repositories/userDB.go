@@ -2,10 +2,12 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"id-generator/services"
 
-	"log"
+    "log"
 	"time"
 
 	"fmt"
@@ -58,7 +60,7 @@ func GetUser(uid string) (models.User, error) {
 
 	err := storage.Collections.Users.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
-		log.Fatalf("find collection err : %v", err)
+		return user, errors.New("cannot find user")
 	}
 
 	log.Printf("%v documents fetched ", user)
@@ -68,7 +70,14 @@ func GetUser(uid string) (models.User, error) {
 
 func CreateUser(user models.User) (models.User, error) {
 	fmt.Println("Creating user...")
+
 	user.CreatedAt = time.Now()
+	if user.UID == "" {
+		user.UID = services.GenerateUid()
+	}
+
+	fmt.Printf("======= USER ================ %#v", user)
+
 	insertedResult, err := storage.Collections.Users.InsertOne(context.Background(), user)
 
 	if err != nil {
