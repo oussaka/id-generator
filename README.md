@@ -60,3 +60,9 @@ The application starts at port 8080:
     GET /v1/users/:id Get a one user details
     PUT /v1/users/:id Update a user
     DELETE /v1/users/:id Delete a user
+
+## commands
+
+### import new users from external API
+
+``` ./cmd/import/importer import -startDate=2024-12-01 -color
