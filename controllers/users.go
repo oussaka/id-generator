@@ -1,22 +1,22 @@
 package controllers
 
 import (
+	"fmt"
 	"id-generator/models"
 	"id-generator/repositories"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-//----------
+// ----------
 // Handlers
-//----------
+// ----------
 func GetUsers(c echo.Context) error {
 	fmt.Println("GETUsers controller")
 
 	// query all data
-	fmt.Println("== query all data ==")
+	fmt.Println("== query all users ==")
 
 	users, err := repositories.GetUsers()
 	if err != nil {
@@ -31,11 +31,11 @@ func GetUser(c echo.Context) error {
 
 	uid := c.Param("uid")
 	// query all data
-	fmt.Println("== query all data ==")
+	fmt.Println("== query one user ==")
 
 	user, err := repositories.GetUser(uid)
 	if err != nil {
-		if (err.Error() == "cannot find user") {
+		if err.Error() == "cannot find user" {
 			return c.JSON(http.StatusNotFound, err.Error())
 		}
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -47,7 +47,7 @@ func GetUser(c echo.Context) error {
 func CreateUser(c echo.Context) error {
 	user := models.User{}
 	c.Bind(&user)
-	
+
 	fmt.Println("createUser controller")
 	fmt.Printf("%#v", user)
 
