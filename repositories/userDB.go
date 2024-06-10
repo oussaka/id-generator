@@ -3,11 +3,13 @@ package repositories
 import (
 	"context"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"id-generator/services"
 
-    "log"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"log"
 	"time"
 
 	"fmt"
@@ -15,7 +17,6 @@ import (
 	"id-generator/models"
 	"id-generator/storage"
 )
-
 
 func GetUsers() ([]models.User, error) {
 	fmt.Println("GET users...")
@@ -39,9 +40,9 @@ func GetUsers() ([]models.User, error) {
 
 	for _, doc := range queryResult {
 		users = append(users, models.User{
-			UID: doc.UID,
-			Name: doc.Name,
-			Email: doc.Email,
+			UID:       doc.UID,
+			Name:      doc.Name,
+			Email:     doc.Email,
 			CreatedAt: doc.CreatedAt,
 			UpdatedAt: doc.UpdatedAt,
 		})
@@ -66,6 +67,25 @@ func GetUser(uid string) (models.User, error) {
 	log.Printf("%v documents fetched ", user)
 
 	return user, err
+}
+
+func FindUserBy(filter map[string]interface{}) (models.User, error) {
+	fmt.Println("GET user...", filter)
+
+	var user models.User
+
+	err := storage.Collections.Users.FindOne(context.Background(), filter).Decode(&user)
+	if err == mongo.ErrNoDocuments {
+		return user, err
+	}
+
+	if err != nil {
+		return user, errors.New("Query return error: " + err.Error())
+	}
+
+	log.Printf("%v documents fetched ", user)
+
+	return user, nil
 }
 
 func CreateUser(user models.User) (models.User, error) {
