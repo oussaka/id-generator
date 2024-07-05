@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"id-generator/storage"
-	"id-generator/routes"
 	"id-generator/handlers"
+	"id-generator/routes"
+	"id-generator/storage"
 )
 
 func main() {
